@@ -17,7 +17,7 @@ parser.add_argument('--output_file', '-o', type=str, required=True, help='path t
 parser.add_argument('--shrink_factor', '-s', type=int, default=1, help='shrink factor (default = 1)')
 parser.add_argument('--iterations', '-n', type=int, default=50, help='number of iterations (default = 50)')
 parser.add_argument('--levels', '-l', type=int, default=4, help='number of fitting levels (default = 4)')
-parser.add_argument('--verbose', '-v', action='store_true', help='report iterations and convergence values')
+parser.add_argument('--verbose', '-v', action='store_true', help='display progress')
 args = parser.parse_args()
 
 # Load input file
@@ -57,7 +57,8 @@ corrector.SetMaximumNumberOfIterations([iterations] * levels)
 # Setup reporting
 if args.verbose:
     if version.parse(sitk.__version__) >= version.parse('2.3.0rc1.post24'):
-        corrector.AddCommand(sitk.sitkProgressEvent, lambda: command_iteration(corrector))
+        corrector.AddCommand(sitk.sitkIterationEvent, lambda: command_iteration(corrector))
+
     else:
         print('Warning: Progress reporting requires SimpleITK version 2.3.0 or later. '
               f'Current version: {sitk.__version__}. '
