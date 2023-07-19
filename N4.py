@@ -1,14 +1,23 @@
 import argparse
+from packaging import version
 
 import SimpleITK as sitk
+
+
+def command_iteration(filter: sitk.N4BiasFieldCorrectionImageFilter):
+    print('------------------------------------')
+    print(f'Level = {filter.GetCurrentLevel()} | Iteration = {filter.GetElapsedIterations()} | '
+          f'Lambda = {filter.GetCurrentConvergenceMeasurement()} ')
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--input_file', '-i', type=str, required=True, help='path to the input file')
 parser.add_argument('--mask_file', '-m', type=str, default=None, help='path to the mask file')
 parser.add_argument('--output_file', '-o', type=str, required=True, help='path to the output file')
 parser.add_argument('--shrink_factor', '-s', type=int, default=1, help='shrink factor (default = 1)')
-parser.add_argument('--iterations', '-n', type=int, default=1, help='number of iterations (default = 1)')
+parser.add_argument('--iterations', '-n', type=int, default=50, help='number of iterations (default = 50)')
 parser.add_argument('--levels', '-l', type=int, default=4, help='number of fitting levels (default = 4)')
+parser.add_argument('--verbose', '-v', action='store_true', help='report iterations and convergence values')
 args = parser.parse_args()
 
 # Load input file
@@ -35,6 +44,8 @@ if shrink_factor > 1:
 
 # Setup corrector
 corrector = sitk.N4BiasFieldCorrectionImageFilter()
+
+# Setup iterations
 levels = int(args.levels)
 assert levels > 0, 'Number of fitting levels must be positive.'
 
@@ -42,6 +53,15 @@ iterations = int(args.iterations)
 assert iterations > 0, 'Number of iterations must be positive.'
 
 corrector.SetMaximumNumberOfIterations([iterations] * levels)
+
+# Setup reporting
+if args.verbose:
+    if version.parse(sitk.__version__) >= version.parse('2.3.0rc1.post24'):
+        corrector.AddCommand(sitk.sitkProgressEvent, lambda: command_iteration(corrector))
+    else:
+        print('Warning: Progress reporting requires SimpleITK version 2.3.0 or later. '
+              f'Current version: {sitk.__version__}. '
+              'Progress will not be reported.')
 
 # Correct image
 output = corrector.Execute(image, mask)

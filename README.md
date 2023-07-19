@@ -20,4 +20,10 @@ a mask will be automatically generated using Otsu's method.
 Note the specified mask should be of the same shape as the input volume.
 
 To specify the number of iterations to perform, use `--iterations` or `-n`.
-More iterations yield better result but also takes longer to run.
+More iterations yield better result but also takes longer to run. 
+The default number of iterations is 50.
+
+To enable progress reporting, use `--verbose` or `-v` (only works with SimpleITK 2.3.0 or later).
+To install the latest pre-release version of SimpleITK, run the following command in a terminal:
+
+    pip install --upgrade --pre SimpleITK --find-links https://github.com/SimpleITK/SimpleITK/releases/tag/latest
