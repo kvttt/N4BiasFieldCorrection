@@ -23,6 +23,12 @@ To specify the number of iterations to perform, use `--iterations` or `-n`.
 More iterations yield better result but also takes longer to run. 
 The default number of iterations is 50.
 
+Use `--get_bias_field` or `-b` 
+to save the estimated bias field as a NIfTI file under the same directory as the output file.
+
+Use `--get_mask` or `-k`
+to save the generated/specified mask as a NIfTI file under the same directory as the output file.
+
 To enable progress reporting, use `--verbose` or `-v` (only works with SimpleITK 2.3.0 or later).
 To install the latest pre-release version of SimpleITK, run the following command in a terminal:
 
